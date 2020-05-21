@@ -847,6 +847,7 @@ namespace StarCraftMapBrowser
                     }
                     grid.Rows.RemoveAt(row.Index);
                 }
+                if(maps.Count == 0) MapImage.BackgroundImage = null;
                 SerializeToXML(mapsDataBase);
                 infoBox.AppendText("Deleted " + deleted + " file(s).");
                 infoBox.AppendText(Environment.NewLine);
