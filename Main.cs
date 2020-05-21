@@ -865,100 +865,94 @@ namespace StarCraftMapBrowser
             if (item.Text == "&Copy")
             {
                 int copied = 0;
-                foreach (DataGridViewRow row in grid.SelectedRows)
+                using (var fbd = new FolderBrowserDialog())
                 {
-                    string file = row.Cells[0].Value.ToString();
-                    if (File.Exists(file))
+
+                    fbd.SelectedPath = startingFolder;
+                    DialogResult result = fbd.ShowDialog();
+
+                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        using (var fbd = new FolderBrowserDialog())
+                        foreach (DataGridViewRow row in grid.SelectedRows)
                         {
-
-                            fbd.SelectedPath = @"D:\2\Test folder";
-                            DialogResult result = fbd.ShowDialog();
-
-                            if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                            string file = row.Cells[0].Value.ToString();
+                            if (File.Exists(file))
                             {
                                 Regex extractFilename = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
                                 Match match = extractFilename.Match(file);
                                 string destination = fbd.SelectedPath + "\\" + match.Groups[2].Value + match.Groups[3].Value;
-                                if (File.Exists(file))
+                                if (!File.Exists(destination))
                                 {
-                                    if (!File.Exists(destination))
-                                    {
-                                        File.Copy(file, destination);
-                                        CopyJpeg(file, destination);
-                                        //string filename = ((DataRowView)row.DataBoundItem).Row.ItemArray[0].ToString();
-                                        string name = ((DataRowView)row.DataBoundItem).Row.ItemArray[1].ToString();
-                                        string description = ((DataRowView)row.DataBoundItem).Row.ItemArray[2].ToString();
-                                        string hash = ((DataRowView)row.DataBoundItem).Row.ItemArray[3].ToString();
-                                        string tilehash = ((DataRowView)row.DataBoundItem).Row.ItemArray[4].ToString();
-                                        ((DataRowView)row.DataBoundItem).DataView.Table.Rows.Add(destination, name, description, hash, tilehash);
-                                        maps.Add(new Map(destination, name, description, hash, tilehash));
-                                        copied++;
-                                    }
-                                    else
-                                    {
-                                        infoBox.AppendText("File " + destination + " already exists.");
-                                        infoBox.AppendText(Environment.NewLine);
-                                    }
+                                    File.Copy(file, destination);
+                                    CopyJpeg(file, destination);
+                                    //string filename = ((DataRowView)row.DataBoundItem).Row.ItemArray[0].ToString();
+                                    string name = ((DataRowView)row.DataBoundItem).Row.ItemArray[1].ToString();
+                                    string description = ((DataRowView)row.DataBoundItem).Row.ItemArray[2].ToString();
+                                    string hash = ((DataRowView)row.DataBoundItem).Row.ItemArray[3].ToString();
+                                    string tilehash = ((DataRowView)row.DataBoundItem).Row.ItemArray[4].ToString();
+                                    ((DataRowView)row.DataBoundItem).DataView.Table.Rows.Add(destination, name, description, hash, tilehash);
+                                    maps.Add(new Map(destination, name, description, hash, tilehash));
+                                    copied++;
+                                }
+                                else
+                                {
+                                    infoBox.AppendText("File " + destination + " already exists.");
+                                    infoBox.AppendText(Environment.NewLine);
                                 }
                             }
                         }
+                        SerializeToXML(mapsDataBase);
+                        infoBox.AppendText("Copied " + copied + " file(s).");
+                        infoBox.AppendText(Environment.NewLine);
                     }
                 }
-                SerializeToXML(mapsDataBase);
-                infoBox.AppendText("Copied " + copied + " file(s).");
-                infoBox.AppendText(Environment.NewLine);
             }
             if (item.Text == "&Move")
             {
                 int moved = 0;
-                foreach (DataGridViewRow row in grid.SelectedRows)
+                using (var fbd = new FolderBrowserDialog())
                 {
-                    string file = row.Cells[0].Value.ToString();
-                    if (File.Exists(file))
+
+                    fbd.SelectedPath = startingFolder;
+                    DialogResult result = fbd.ShowDialog();
+
+                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        using (var fbd = new FolderBrowserDialog())
+                        foreach (DataGridViewRow row in grid.SelectedRows)
                         {
-
-                            fbd.SelectedPath = @"D:\2\Test folder";
-                            DialogResult result = fbd.ShowDialog();
-
-                            if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                            string file = row.Cells[0].Value.ToString();
+                            if (File.Exists(file))
                             {
                                 Regex extractFilename = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
                                 Match match = extractFilename.Match(file);
                                 string destination = fbd.SelectedPath + "\\" + match.Groups[2].Value + match.Groups[3].Value;
-                                if (File.Exists(file))
+                                if (!File.Exists(destination))
                                 {
-                                    if (!File.Exists(destination))
+                                    File.Move(file, destination);
+                                    MoveJpeg(file, destination);
+                                    foreach (Map map in maps)
                                     {
-                                        File.Move(file, destination);
-                                        MoveJpeg(file, destination);
-                                        foreach (Map map in maps)
+                                        if (map.orgFilename == file)
                                         {
-                                            if (map.orgFilename == file)
-                                            {
-                                                map.orgFilename = destination;
-                                                break;
-                                            }
+                                            map.orgFilename = destination;
+                                            break;
                                         }
-                                        row.Cells[0].Value = destination;
-                                        moved++;
                                     }
-                                    else
-                                    {
-                                        infoBox.AppendText("File " + destination + " already exists.");
-                                        infoBox.AppendText(Environment.NewLine);
-                                    }
+                                    row.Cells[0].Value = destination;
+                                    moved++;
+                                }
+                                else
+                                {
+                                    infoBox.AppendText("File " + destination + " already exists.");
+                                    infoBox.AppendText(Environment.NewLine);
                                 }
                             }
                         }
+                        SerializeToXML(mapsDataBase);
+                        infoBox.AppendText("Moved " + moved + " file(s).");
+                        infoBox.AppendText(Environment.NewLine);
                     }
                 }
-                SerializeToXML(mapsDataBase);
-                infoBox.AppendText("Moved " + moved + " file(s).");
-                infoBox.AppendText(Environment.NewLine);
             }
             if (item.Text == "&Rename")
             {
