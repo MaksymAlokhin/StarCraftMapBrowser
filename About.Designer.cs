@@ -33,7 +33,7 @@
             this.StormLink = new System.Windows.Forms.LinkLabel();
             this.OKbtn = new System.Windows.Forms.Button();
             this.Mail = new System.Windows.Forms.LinkLabel();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.GitLink = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // AboutBox
@@ -80,25 +80,26 @@
             this.Mail.TabIndex = 3;
             this.Mail.TabStop = true;
             this.Mail.Text = "Contact the author";
-            this.Mail.Click += new System.EventHandler(this.Mail_Click);
+            this.Mail.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.Mail_LinkClicked);
             // 
-            // linkLabel2
+            // GitLink
             // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.linkLabel2.Location = new System.Drawing.Point(160, 124);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(89, 18);
-            this.linkLabel2.TabIndex = 4;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "GitHub Link";
+            this.GitLink.AutoSize = true;
+            this.GitLink.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.GitLink.Location = new System.Drawing.Point(160, 124);
+            this.GitLink.Name = "GitLink";
+            this.GitLink.Size = new System.Drawing.Size(89, 18);
+            this.GitLink.TabIndex = 4;
+            this.GitLink.TabStop = true;
+            this.GitLink.Text = "GitHub Link";
+            this.GitLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.GitLink_LinkClicked);
             // 
             // About
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(403, 289);
-            this.Controls.Add(this.linkLabel2);
+            this.Controls.Add(this.GitLink);
             this.Controls.Add(this.Mail);
             this.Controls.Add(this.OKbtn);
             this.Controls.Add(this.StormLink);
@@ -118,6 +119,6 @@
         private System.Windows.Forms.LinkLabel StormLink;
         private System.Windows.Forms.Button OKbtn;
         private System.Windows.Forms.LinkLabel Mail;
-        private System.Windows.Forms.LinkLabel linkLabel2;
+        private System.Windows.Forms.LinkLabel GitLink;
     }
 }

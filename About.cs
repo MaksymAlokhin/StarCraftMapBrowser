@@ -16,6 +16,8 @@ namespace StarCraftMapBrowser
         {
             InitializeComponent();
             StormLink.Links.Add(5, 8, "https://github.com/ladislav-zezula/StormLib");
+            GitLink.Links.Add(0, 6, "https://github.com/gform/StarCraftMapBrowser");
+            Mail.Links.Add(12, 6, "mailto:maksym.alokhin@protonmail.com");
             AboutBox.Text = "StarCraft Map Browser v1.0";
         }
 
@@ -29,9 +31,14 @@ namespace StarCraftMapBrowser
             System.Diagnostics.Process.Start(e.Link.LinkData as string);
         }
 
-        private void Mail_Click(object sender, EventArgs e)
+        private void GitLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("mailto:maksym.alokhin@protonmail.com");
+            System.Diagnostics.Process.Start(e.Link.LinkData as string);
+        }
+
+        private void Mail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.Link.LinkData as string);
         }
     }
 }
