@@ -287,6 +287,7 @@ namespace StarCraftMapBrowser
             progressBar.Visible = false;
             progressLBL.Visible = false;
             FilenameTextBox.Visible = true;
+            selectFolderBtn.Text = "Select Folder";
             maps = new List<Map>(tempMaps);
             SaveReportToFile(maps);
 
