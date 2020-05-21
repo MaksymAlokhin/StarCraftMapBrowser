@@ -416,7 +416,7 @@ namespace StarCraftMapBrowser
             if (File.Exists("report.txt")) File.Delete("report.txt");
             fout = new FileStream("report.txt", FileMode.Append);
             StreamWriter fstr_out = new StreamWriter(fout);
-            fstr_out.Write("Name\t" + "Filename\t" + "Hash\n");
+            fstr_out.Write("Name\t" + "Filename\t" + "Hash\n" + "Tilehash\n");
             foreach (Map map in maps)
             {
                 fstr_out.Write(map.name + "\t" + map.orgFilename + "\t" + map.hash + "\t" + map.tileHash + "\n");
