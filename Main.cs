@@ -159,7 +159,7 @@ namespace StarCraftMapBrowser
                 using (var fbd = new FolderBrowserDialog())
                 {
 
-                    fbd.SelectedPath = @"D:\2\Test folder";
+                    //fbd.SelectedPath = @"D:\2\Test folder";
                     DialogResult result = fbd.ShowDialog();
 
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
