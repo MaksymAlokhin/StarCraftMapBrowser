@@ -2,4 +2,4 @@
 StarCraft Map Browser
 
   
-![]("SC Map Browser.png")
+![](SC%20Map%20Browser.png)
