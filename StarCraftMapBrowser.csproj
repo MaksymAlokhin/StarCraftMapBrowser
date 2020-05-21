@@ -241,8 +241,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SC Map Browser.png" />
     <Content Include="sc.ico" />
+    <Content Include="StarCraftMapBrowser.png" />
     <Content Include="StormLib.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

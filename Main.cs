@@ -32,6 +32,7 @@ namespace StarCraftMapBrowser
         int processedMaps;
         string scenario = "staredit\\scenario.chk";
         string mapsDataBase = "mapsdb.xml";
+        string startingFolder;
         Dictionary<byte, List<byte>> replacementDictionary;
         List<byte> filteredChars;
         List<byte> systemIllegalChars;
@@ -118,7 +119,8 @@ namespace StarCraftMapBrowser
             LoadLastSession();
             ReadTileSets();
             stopwatch = new Stopwatch();
-
+            startingFolder = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            files = new List<string>();
             tokenSource = new CancellationTokenSource();
             loopOptions =
                 new ParallelOptions()
@@ -160,12 +162,19 @@ namespace StarCraftMapBrowser
                 {
 
                     //fbd.SelectedPath = @"D:\2\Test folder";
-                    fbd.SelectedPath = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                    fbd.SelectedPath = startingFolder;
                     DialogResult result = fbd.ShowDialog();
 
                     if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                     {
-                        files = Directory.GetFiles(fbd.SelectedPath, "*.sc?", SearchOption.AllDirectories).ToList();
+                        startingFolder = fbd.SelectedPath;
+                        List<string> tempfiles = Directory.GetFiles(fbd.SelectedPath, "*.sc?", SearchOption.AllDirectories).ToList();
+                        Regex filterextensions = new Regex(@"(.*?)([^\\]+)(\.scm|\.scx)", RegexOptions.IgnoreCase);
+                        foreach(string tempfile in tempfiles)
+                        {
+                            Match match = filterextensions.Match(tempfile);
+                            if(match.Success) files.Add(tempfile);
+                        }
                         hashes = new List<string>();
                         cannotOpen = new BlockingCollection<string>();
                         tempMaps = new BlockingCollection<Map>();
@@ -444,7 +453,7 @@ namespace StarCraftMapBrowser
         {
             string newFile = orgFile;
             string replacement = "${1}" + TruncateString(name) + GenerateMapID() + "${3}";
-            newFile = Regex.Replace(newFile, @"(.*?)([^\\]+)(\.sc.)", replacement);
+            newFile = Regex.Replace(newFile, @"(.*?)([^\\]+)(\.sc.)", replacement, RegexOptions.IgnoreCase);
             return newFile;
         }
         public byte[] ReadScenarioFile(string path)
@@ -869,7 +878,7 @@ namespace StarCraftMapBrowser
 
                             if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                             {
-                                Regex extractFilename = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+                                Regex extractFilename = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
                                 Match match = extractFilename.Match(file);
                                 string destination = fbd.SelectedPath + "\\" + match.Groups[2].Value + match.Groups[3].Value;
                                 if (File.Exists(file))
@@ -917,7 +926,7 @@ namespace StarCraftMapBrowser
 
                             if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
                             {
-                                Regex extractFilename = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+                                Regex extractFilename = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
                                 Match match = extractFilename.Match(file);
                                 string destination = fbd.SelectedPath + "\\" + match.Groups[2].Value + match.Groups[3].Value;
                                 if (File.Exists(file))
@@ -1169,7 +1178,7 @@ namespace StarCraftMapBrowser
         }
         string ProcessImage(byte[] arr, string file, ImageSize imageSize)
         {
-            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
             Match match = makeitjpeg.Match(file);
             string jpegfile = match.Groups[1].Value + match.Groups[2].Value + ".jpg";
             string bigjpegfile = match.Groups[1].Value + match.Groups[2].Value + "_big" + ".jpg";
@@ -1397,7 +1406,7 @@ namespace StarCraftMapBrowser
             if ((sender as DataGridView).CurrentCell != null)
             {
                 string mapfilename = (sender as DataGridView).CurrentRow.Cells[0].Value.ToString();
-                Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+                Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
                 Match match = makeitjpeg.Match(mapfilename);
                 string jpegfile = match.Groups[1].Value + match.Groups[2].Value + ".jpg";
 
@@ -1416,7 +1425,7 @@ namespace StarCraftMapBrowser
         }
         void DeleteJpeg(string path)
         {
-            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
             Match match = makeitjpeg.Match(path);
             string jpegfile = match.Groups[1].Value + match.Groups[2].Value + ".jpg";
             string bigjpegfile = match.Groups[1].Value + match.Groups[2].Value + "_big" + ".jpg";
@@ -1425,7 +1434,7 @@ namespace StarCraftMapBrowser
         }
         void MoveJpeg(string source, string destination)
         {
-            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
             Match s_match = makeitjpeg.Match(source);
             string s_jpegfile = s_match.Groups[1].Value + s_match.Groups[2].Value + ".jpg";
             string s_bigjpegfile = s_match.Groups[1].Value + s_match.Groups[2].Value + "_big" + ".jpg";
@@ -1439,7 +1448,7 @@ namespace StarCraftMapBrowser
         }
         void CopyJpeg(string source, string destination)
         {
-            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)");
+            Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
             Match s_match = makeitjpeg.Match(source);
             string s_jpegfile = s_match.Groups[1].Value + s_match.Groups[2].Value + ".jpg";
             string s_bigjpegfile = s_match.Groups[1].Value + s_match.Groups[2].Value + "_big" + ".jpg";

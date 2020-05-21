@@ -62,7 +62,7 @@
             // 
             this.selectFolderBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.selectFolderBtn.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.selectFolderBtn.Location = new System.Drawing.Point(1001, 585);
+            this.selectFolderBtn.Location = new System.Drawing.Point(1004, 623);
             this.selectFolderBtn.Name = "selectFolderBtn";
             this.selectFolderBtn.Size = new System.Drawing.Size(129, 36);
             this.selectFolderBtn.TabIndex = 4;
@@ -87,7 +87,7 @@
             // 
             this.renameAllBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.renameAllBtn.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.renameAllBtn.Location = new System.Drawing.Point(869, 585);
+            this.renameAllBtn.Location = new System.Drawing.Point(869, 623);
             this.renameAllBtn.Name = "renameAllBtn";
             this.renameAllBtn.Size = new System.Drawing.Size(129, 36);
             this.renameAllBtn.TabIndex = 3;
@@ -273,10 +273,11 @@
             // 
             // ClearMissingBtn
             // 
+            this.ClearMissingBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ClearMissingBtn.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ClearMissingBtn.Location = new System.Drawing.Point(266, 31);
+            this.ClearMissingBtn.Location = new System.Drawing.Point(869, 581);
             this.ClearMissingBtn.Name = "ClearMissingBtn";
-            this.ClearMissingBtn.Size = new System.Drawing.Size(156, 32);
+            this.ClearMissingBtn.Size = new System.Drawing.Size(129, 32);
             this.ClearMissingBtn.TabIndex = 13;
             this.ClearMissingBtn.Text = "Clear Missing";
             this.ClearMissingBtn.UseVisualStyleBackColor = true;
@@ -284,10 +285,11 @@
             // 
             // ClearAllBtn
             // 
+            this.ClearAllBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.ClearAllBtn.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ClearAllBtn.Location = new System.Drawing.Point(443, 31);
+            this.ClearAllBtn.Location = new System.Drawing.Point(1004, 581);
             this.ClearAllBtn.Name = "ClearAllBtn";
-            this.ClearAllBtn.Size = new System.Drawing.Size(156, 32);
+            this.ClearAllBtn.Size = new System.Drawing.Size(129, 32);
             this.ClearAllBtn.TabIndex = 14;
             this.ClearAllBtn.Text = "Clear All";
             this.ClearAllBtn.UseVisualStyleBackColor = true;
