@@ -33,6 +33,7 @@ namespace StarCraftMapBrowser
         string scenario = "staredit\\scenario.chk";
         string mapsDataBase = "mapsdb.xml";
         string startingFolder;
+        //Dictionary for cleaning strings. Очистка тексту
         Dictionary<byte, List<byte>> replacementDictionary;
         List<byte> filteredChars;
         List<byte> systemIllegalChars;
@@ -42,6 +43,7 @@ namespace StarCraftMapBrowser
         FileStream fout;
         Stopwatch stopwatch;
         BindingSource bindingSource;
+        //Token source for cancelling Parallel.ForEach loop. Відміна паралельних циклів
         CancellationTokenSource tokenSource;
         ParallelOptions loopOptions;
 
@@ -55,6 +57,7 @@ namespace StarCraftMapBrowser
 
         DataSet dataSet;
         DataTable mapsTable;
+        //Different degrees of cleaning. Різні рівні очистки тексту
         public enum TextType
         {
             map,
@@ -66,6 +69,7 @@ namespace StarCraftMapBrowser
             fullsize,
             both
         };
+        //Graphics. Графіка
         #region Tilesets
         byte[] ashworld_cv5;
         byte[] ashworld_vx4;
@@ -109,7 +113,6 @@ namespace StarCraftMapBrowser
             progressLBL.Visible = false;
             FilenameTextBox.Visible = true;
             random = new Random();
-            //emptyBitmap = new Bitmap(1, 1);
             InitializeReplacements();
             updateProgressTimer = new System.Windows.Forms.Timer();
             updateProgressTimer.Interval = 1000;
@@ -132,6 +135,7 @@ namespace StarCraftMapBrowser
             //this.bgWorker1.ProgressChanged += new ProgressChangedEventHandler(bgWorker1_ProgressChanged);
             this.bgWorker1.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bgWorker1_RunWorkerCompleted);
         }
+        //Завантаження попередньої сесії
         void LoadLastSession()
         {
             //dataBase
@@ -154,6 +158,7 @@ namespace StarCraftMapBrowser
                 infoBox.AppendText(Environment.NewLine);
             }
         }
+        //Select folder button. Кнопка вибору папки
         public void selectFolderBtn_Click(object sender, EventArgs e)
         {
             if(selectFolderBtn.Text == "Select Folder")
@@ -204,6 +209,7 @@ namespace StarCraftMapBrowser
                 SerializeToXML(mapsDataBase);
             }
         }
+        //Rename All button. Кнопка "Перейменувати все"
         public void renameAllBtn_Click(object sender, EventArgs e)
         {
             if (maps != null)
@@ -259,9 +265,9 @@ namespace StarCraftMapBrowser
                 if (DupeMenu.Checked) infoBox.AppendText("Renamed " + moveCount + " file(s)." + " Deleted " + dupCount + " duplicate(s).");
                 else infoBox.AppendText("Renamed " + moveCount + " file(s).");
                 infoBox.AppendText(Environment.NewLine);
-
             }
         }
+        //Select folder button runs this worker. Кнопка "Вибрати папку" запускає робітника
         public void bgWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             try
@@ -272,14 +278,16 @@ namespace StarCraftMapBrowser
                         byte[] fileContents = ReadScenarioFile(file);
                         if (fileContents != null)
                         {
+                            //hash uniquely identifies map as a whole. Унікальність карти
                             string hash = getMd5Hash(fileContents);
                             List<byte[]> mapStrings = GetMapStrings(fileContents);
                             string name = Encoding.ASCII.GetString(CleanName(mapStrings[0], TextType.map)); //map
                             string description = Encoding.ASCII.GetString(CleanName(mapStrings[1], TextType.description)); //description
+                            //tilehash uniquely identifies map terrain. Унікальність ландшафту
                             string tilehash = ProcessImage(fileContents, file, ImageSize.thumbnail);
                             tempMaps.Add(new Map(file, name, description, hash, tilehash));
                         }
-                        tlsValue++;
+                        tlsValue++; //number of processed maps. Кількість оброблених карт
                         return tlsValue;
                     },
                         tlsValue => Interlocked.Add(ref processedMaps, tlsValue));
@@ -290,6 +298,7 @@ namespace StarCraftMapBrowser
             }
 
         }
+        //Select Folder finished processing. Дії після завершення пошуку карт по кнопці "Вибрати папку"
         public void bgWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             stopwatch.Stop();
@@ -322,6 +331,7 @@ namespace StarCraftMapBrowser
 
             RefreshDataGridView();
         }
+        //Save full size JPEGs. Збереження повномасштабних зображень
         private void bgWorkerBigJPEGs_DoWork(object sender, DoWorkEventArgs e)
         {
             stopwatch.Reset();
@@ -339,6 +349,7 @@ namespace StarCraftMapBrowser
             infoBox.AppendText(Environment.NewLine);
             bigJPEGs.Clear();
         }
+        //Not used. Не використовується
         public static DataTable ToDataTable<T>(IList<T> data)
         {
             PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(T));
@@ -354,6 +365,7 @@ namespace StarCraftMapBrowser
             }
             return table;
         }
+        //Оновлення списку карт на екрані
         void RefreshDataGridView()
         {
             mapsTable.Clear();
@@ -365,6 +377,8 @@ namespace StarCraftMapBrowser
 
             grid.Focus();
         }
+        //Create DataSet, DataTable and add columns to DataGridView
+        //Створити базу даних, таблиці та додати стовпчики до представлення DataGridView
         void InitializeGrid()
         {
             dataSet = new DataSet();
@@ -405,12 +419,14 @@ namespace StarCraftMapBrowser
 
             grid.DataSource = bindingSource;
         }
+        //Оновлення стрічки прогресу
         public void UpdateProgressbar(object sender, EventArgs e)
         {
             double progress = (double)processedMaps / files.Count * 100;
             progressBar.Value = (int)progress;
             progressLBL.Text = ((int)progress).ToString() + "%";
         }
+        //Збереження файлу-звіту
         void SaveReportToFile(List<Map> maps)
         {
             if (File.Exists("report.txt")) File.Delete("report.txt");
@@ -423,6 +439,7 @@ namespace StarCraftMapBrowser
             }
             fstr_out.Close();
         }
+        //Перейменування файлу
         public string RenameFile(string orgFile, string name)
         {
             if (File.Exists(orgFile))
@@ -437,18 +454,21 @@ namespace StarCraftMapBrowser
             }
             else return null;
         }
+        //Map name should be 27 chars + dot + extension. 23+_XXX = 27. Обрізка задовгих назв карт
         public string TruncateString(string name)
         {
             if (name.Length == 0) name = "Noname";
             if (name.Length > 23) name = name.Substring(0, 23);
             return name;
         }
+        //Maps often have same names. This makes them unique. Генерація унікального ID
         public string GenerateMapID()
         {
             string mapID = "_";
             for (int i = 0; i < 3; i++) mapID += randomSequence[random.Next(0, 36)];
             return mapID;
         }
+        //Generate a filename from name and unique ID during renaming. Генерація імені файлу при перейменуванні
         public string GetNewFileName(string orgFile, string name)
         {
             string newFile = orgFile;
@@ -456,6 +476,7 @@ namespace StarCraftMapBrowser
             newFile = Regex.Replace(newFile, @"(.*?)([^\\]+)(\.sc.)", replacement, RegexOptions.IgnoreCase);
             return newFile;
         }
+        //Read scenario.chk. Читання даних карти
         public byte[] ReadScenarioFile(string path)
         {
             IntPtr mpqHandle = new IntPtr();
@@ -480,6 +501,7 @@ namespace StarCraftMapBrowser
                 return null;
             }
         }
+        //Get size of scenario.chk. Визначення розміру файлу
         uint GetScenarioSize(string path)
         {
             IntPtr mpqHandle = new IntPtr();
@@ -495,6 +517,7 @@ namespace StarCraftMapBrowser
             }
             else return 0;
         }
+        //Get name & description from scenario.chk data. Визначення імені та опису карти
         public List<byte[]> GetMapStrings(byte[] arr)
         {
             int MapNameIndex = 0; //map name index
@@ -505,6 +528,7 @@ namespace StarCraftMapBrowser
             //string[] MapStrings = new string[2];
             string text = Encoding.ASCII.GetString(arr);
             List<int> indexesList = new List<int>();
+            //scoring is used to determine the real section in protected maps
             List<int> scoreList = new List<int>();
             int score = 0;
             for (int index = 0; ; index += 4)
@@ -575,8 +599,6 @@ namespace StarCraftMapBrowser
             MapNameOffset = idx + 8 + BitConverter.ToUInt16(arr, idx + 10 + (MapNameIndex - 1) * 2); //map name
             MapDescOffset = idx + 8 + BitConverter.ToUInt16(arr, idx + 10 + (MapDescIndex - 1) * 2); //map description
 
-            //result[0] = new byte[] { };
-            //result[1] = new byte[] { };
             //get map name
             if (MapNameIndex > 0)
             {
@@ -616,9 +638,10 @@ namespace StarCraftMapBrowser
             else result.Add(Encoding.ASCII.GetBytes("No description"));
             return result;
         }
+        //Remove & replace some characters from map name and description. Видалення деяких символів з назв та описів карт
         public byte[] CleanName(byte[] name, TextType type)
         {
-            //replace accents and beautified characters with regular letters
+            //replace accents (diacritical marks) and beautified characters with regular letters. Видалення діакритики
             List<byte> byteBuilder = new List<byte>();
             foreach (byte symbol in name)
             {
@@ -648,10 +671,11 @@ namespace StarCraftMapBrowser
 
             //clean up
             string tempName = Encoding.ASCII.GetString(cleanBytes.ToArray());
-            tempName = Regex.Replace(tempName, "(.)\\1{4,}", "$1"); //repeating chars
-            tempName = Regex.Replace(tempName, "^ *(.*?) *$", "$1"); //trailing spaces
+            tempName = Regex.Replace(tempName, "(.)\\1{4,}", "$1"); //repeating chars. Повторювані символи
+            tempName = Regex.Replace(tempName, "^ *(.*?) *$", "$1"); //trailing spaces. Пробіли в кінці і на початку
             return Encoding.ASCII.GetBytes(tempName);
         }
+        //Calculate MD5 hash. Хешування
         public static string getMd5Hash(byte[] input)
         {
             MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
@@ -663,6 +687,7 @@ namespace StarCraftMapBrowser
             }
             return sBuilder.ToString();
         }
+        //Replace & remove some characters in texts. Заміна символів
         void InitializeReplacements()
         {
             replacementDictionary = new Dictionary<byte, List<byte>>();
@@ -787,7 +812,7 @@ namespace StarCraftMapBrowser
                 systemIllegalChars.Add(0x0D);
             }
 
-            //random sequence
+            //random sequence, used in uniqe ID
             randomSequence = new List<string>();
             //numbers (10)
             for (char c = '\u0030'; c <= '\u0039'; c++)
@@ -796,11 +821,13 @@ namespace StarCraftMapBrowser
             for (char c = '\u0041'; c <= '\u005A'; c++)
                 randomSequence.Add(c.ToString());
         }
+        //About menu. Меню "Про програму"
         public void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             About about = new About();
             about.Show();
         }
+        //Контекстне меню
         void InitializeContextMenu()
         {
             mapMenu = new ContextMenuStrip();
@@ -1028,6 +1055,7 @@ namespace StarCraftMapBrowser
 
             }
         }
+        //Filter fields. Поля фільтрації
         private void FilenameTextBox_TextChanged(object sender, EventArgs e)
         {
             try
@@ -1052,6 +1080,7 @@ namespace StarCraftMapBrowser
                 MapnameFilter.BackColor = Color.Pink;
             }
         }
+        //Replace some symbols, so that filtering works without errors. Заміна введених символів у вікнах фільтрації
         static string EscapeSqlLike(string s_)
         {
             StringBuilder s = new StringBuilder(s_);
@@ -1070,10 +1099,7 @@ namespace StarCraftMapBrowser
             }
             return s.ToString();
         }
-        private void RefreshBtn_Click(object sender, EventArgs e)
-        {
-            RefreshDataGridView();
-        }
+        //Серіалізація
         public void SerializeToXML(string filename)
         {
             XmlWriterSettings ws = new XmlWriterSettings();
@@ -1083,8 +1109,6 @@ namespace StarCraftMapBrowser
             {
                 s.Serialize(wr, maps);
             }
-
-            //writer.Close();
         }
         List<Map> DeserializeFromXML(string filename)
         {
@@ -1104,6 +1128,7 @@ namespace StarCraftMapBrowser
             fs.Close();
             return mapsFromFile;
         }
+        //Зміна розміру зображення
         private Bitmap ResizeImage(Bitmap bm, float scale)
         {
             int width = (int)(bm.Width * scale);
@@ -1126,6 +1151,7 @@ namespace StarCraftMapBrowser
             }
             return result_bm;
         }
+        //Load graphics. Завантаження графіки
         void ReadTileSets()
         {
             ashworld_cv5 = File.ReadAllBytes("Tileset\\ashworld.cv5");
@@ -1170,6 +1196,7 @@ namespace StarCraftMapBrowser
             tilesetDic.Add(6, new List<byte[]> { Ice_cv5, Ice_vx4, Ice_vr4, Ice_wpe });
             tilesetDic.Add(7, new List<byte[]> { Twilight_cv5, Twilight_vx4, Twilight_vr4, Twilight_wpe });
         }
+        //Saves jpeg with image of map terrain, returns terrain hash. Зберігає малюнок карти, повертає хеш ландшафту
         string ProcessImage(byte[] arr, string file, ImageSize imageSize)
         {
             Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
@@ -1177,9 +1204,6 @@ namespace StarCraftMapBrowser
             string jpegfile = match.Groups[1].Value + match.Groups[2].Value + ".jpg";
             string bigjpegfile = match.Groups[1].Value + match.Groups[2].Value + "_big" + ".jpg";
             string pngfile = match.Groups[1].Value + match.Groups[2].Value + ".png";
-            //string tifffile = match.Groups[1].Value + match.Groups[2].Value + ".tiff";
-            //string bmpfile = match.Groups[1].Value + match.Groups[2].Value + ".bmp";
-            //string giffile = match.Groups[1].Value + match.Groups[2].Value + ".gif";
             int ERAOffset = 0; //tileset
             int DIMOffset = 0; //dimensions
             //int MTXMOffset = 0; //map name offset
@@ -1337,7 +1361,8 @@ namespace StarCraftMapBrowser
                         }
                     }
                 }
-                using (Bitmap bmp = new Bitmap(width * 32, height * 32, PixelFormat.Format24bppRgb)) //each megatile is 32x32px
+                //each megatile is 32x32px
+                using (Bitmap bmp = new Bitmap(width * 32, height * 32, PixelFormat.Format24bppRgb))
                 {
                     Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
                     BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadWrite, bmp.PixelFormat);
@@ -1368,20 +1393,15 @@ namespace StarCraftMapBrowser
 
                         //save png
                         //smallbmp.Save(pngfile, ImageFormat.Png);
-                        //smallbmp.Save(tifffile, ImageFormat.Tiff);
-                        //smallbmp.Save(bmpfile, ImageFormat.Bmp);
-                        //smallbmp.Save(giffile, ImageFormat.Gif);
                     }
 
                     pixels = null;
                     GC.Collect();
-
-                    //return bmp;
                 }
             }
             return tilehash;
         }
-
+        //Used for saving JPEGs. Визначення інформації про кодек
         private static ImageCodecInfo GetEncoderInfo(String mimeType)
         {
             int j;
@@ -1394,7 +1414,7 @@ namespace StarCraftMapBrowser
             }
             return null;
         }
-
+        //Update map image when changing selected item. Оновлення зображення карти при переміщенні по списку
         private void grid_CurrentCellChanged(object sender, EventArgs e)
         {
             if ((sender as DataGridView).CurrentCell != null)
@@ -1412,11 +1432,8 @@ namespace StarCraftMapBrowser
                 }
                 else MapImage.BackgroundImage = null;
             }
-
-            //int rowIndex = grid.CurrentCell.RowIndex;
-            //((DataRowView)rowIndex.DataBoundItem).Row.ItemArray[4]
-            //MapImage.
         }
+        //Methods for manipulating JPEG files. Маніпуляція файлами зображень
         void DeleteJpeg(string path)
         {
             Regex makeitjpeg = new Regex(@"(.*?)([^\\]+)(\.sc.)", RegexOptions.IgnoreCase);
@@ -1454,6 +1471,7 @@ namespace StarCraftMapBrowser
             if (!File.Exists(d_jpegfile) && File.Exists(s_jpegfile)) File.Copy(s_jpegfile, d_jpegfile);
             if (!File.Exists(d_bigjpegfile) && File.Exists(s_bigjpegfile)) File.Copy(s_bigjpegfile, d_bigjpegfile);
         }
+        //Clear list from files that are no longer there. Очистка списку від записів, файли яких були видалені
         private void ClearMissingBtn_Click(object sender, EventArgs e)
         {
             if (maps.Count > 0)
@@ -1471,7 +1489,7 @@ namespace StarCraftMapBrowser
             infoBox.AppendText(maps.Count() + " maps found.");
             infoBox.AppendText(Environment.NewLine);
         }
-
+        //Clear map database. Очистка бази даних карт
         private void ClearAllBtn_Click(object sender, EventArgs e)
         {
             maps.Clear();

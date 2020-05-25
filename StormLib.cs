@@ -9,14 +9,7 @@ namespace StarCraftMapBrowser
 {
     class StormLib
     {
-        //public const string STORMLIB = "stormlib.dll";
-        //[DllImport(STORMLIB, CallingConvention = CallingConvention.Winapi, ExactSpelling = true, PreserveSig = true, SetLastError = true, ThrowOnUnmappableChar = false)]
-        //public static extern bool SFileOpenArchive(
-        //    [MarshalAs(UnmanagedType.LPTStr)] string szMpqName,
-        //    uint dwPriority,
-        //    uint dwFlags,
-        //    ref IntPtr phMpq
-        //    );
+        //Import library to manupulate MPQ files. Імпорт бібліотеки для роботи з MPQ архівами
         public const string STORMLIB = "stormlib.dll";
 
         [DllImport(STORMLIB, CallingConvention = CallingConvention.Winapi, ExactSpelling = true, PreserveSig = true, SetLastError = true, ThrowOnUnmappableChar = false)]
