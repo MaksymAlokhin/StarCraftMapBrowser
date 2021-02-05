@@ -175,6 +175,7 @@ namespace StarCraftMapBrowser
                         startingFolder = fbd.SelectedPath;
                         List<string> tempfiles = Directory.GetFiles(fbd.SelectedPath, "*.sc?", SearchOption.AllDirectories).ToList();
                         Regex filterextensions = new Regex(@"(.*?)([^\\]+)(\.scm|\.scx)", RegexOptions.IgnoreCase);
+                        files.Clear();
                         foreach(string tempfile in tempfiles)
                         {
                             Match match = filterextensions.Match(tempfile);
@@ -237,7 +238,17 @@ namespace StarCraftMapBrowser
                                 uint size2 = GetScenarioSize(map.orgFilename);
                                 if (size1 == size2)
                                 {
-                                    if (File.Exists(map.orgFilename)) File.Delete(map.orgFilename);
+                                    if (File.Exists(map.orgFilename))
+                                    {
+                                        FileAttributes fa = File.GetAttributes(map.orgFilename);
+                                        if ((fa & FileAttributes.ReadOnly) != 0)
+                                        {
+                                            // Use the exclusive-or operator (^) to toggle the ReadOnly flag
+                                            fa ^= FileAttributes.ReadOnly;
+                                            File.SetAttributes(map.orgFilename, fa);
+                                        }
+                                        File.Delete(map.orgFilename);
+                                    } 
                                     DeleteJpeg(map.orgFilename);
                                     dupCount++;
                                     break;
@@ -870,7 +881,15 @@ namespace StarCraftMapBrowser
                     string file = row.Cells[0].Value.ToString();
                     if (File.Exists(file))
                     {
+                        FileAttributes fa = File.GetAttributes(file);
+                        if ((fa & FileAttributes.ReadOnly) != 0)
+                        {
+                            // Use the exclusive-or operator (^) to toggle the ReadOnly flag
+                            fa ^= FileAttributes.ReadOnly;
+                            File.SetAttributes(file, fa);
+                        }
                         File.Delete(file);
+
                         DeleteJpeg(file);
                         deleted++;
                     }
@@ -1032,7 +1051,17 @@ namespace StarCraftMapBrowser
                 maps = tempMaps;
                 foreach (string file in filesToDelete)
                 {
-                    if (File.Exists(file)) File.Delete(file);
+                    if (File.Exists(file))
+                    {
+                        FileAttributes fa = File.GetAttributes(file);
+                        if ((fa & FileAttributes.ReadOnly) != 0)
+                        {
+                            // Use the exclusive-or operator (^) to toggle the ReadOnly flag
+                            fa ^= FileAttributes.ReadOnly;
+                            File.SetAttributes(file, fa);
+                        }
+                        File.Delete(file);
+                    }
                     DeleteJpeg(file);
                     removed++;
                 }
