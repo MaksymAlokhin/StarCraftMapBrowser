@@ -1,6 +1,5 @@
 # StarCraftMapBrowser
-StarCraft Map Browser
-=====================
+
 Description:<br />
 -------------
 Map browser and organizer for Blizzard Entertainment's game StarCraft (1998).
